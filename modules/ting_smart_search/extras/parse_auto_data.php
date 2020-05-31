@@ -16,22 +16,14 @@ try {
   $data = array();
   while (($line = fgetcsv($file, 1000, ";")) !== FALSE) {
     if (!(strpos($line[1], 'ereolen') !== false)) {
+      // Needs to be done. The incoming file is not UTF-8.
       $search = mb_convert_encoding($line[0], 'UTF-8', 'ISO-8859-15');;
       $clicked_page = $line[1];
       $hits = $line[2];
-      $object = null;
-      //TODO use reg exp:
-      $match = preg_match("ting\.(collection|object)\.(.+)", $clicked_page, $matches);
-if ($matches) {
-   $faust = $matches[1];
-//      if (strpos($clicked_page, 'ting.object.') !== false) {
-//        $object = explode('ting.object.', $clicked_page);
-//      }
-//      elseif (strpos($clicked_page, 'ting.collection.') !== false) {
-//        $object = explode('ting.collection.', $clicked_page);
-//      }
-//      $faust = $object[1];
-//      if (isset($object) && isset($faust)) {
+      
+      preg_match("%ting\.(collection|object)\.(.+)%", $clicked_page, $matches);
+      if ($matches && isset($matches[2])) {
+        $faust = $matches[2];
         if (!array_key_exists($search, $data)) {
           $data[$search] = array();
         }
@@ -48,10 +40,9 @@ if ($matches) {
   fclose($file);
   foreach ($data as $search => $objects) {
     arsort($objects);
-    //Todo test
-    //if (reset($objects) >= 3) {
-    $output[$search] = array_slice($objects, 0, 5);
-    //}
+    if (reset($objects) >= 3) {
+      $output[$search] = array_slice($objects, 0, 5);
+    }
   }
   $serialized_output = serialize($output);
   file_put_contents($output_file, $serialized_output);

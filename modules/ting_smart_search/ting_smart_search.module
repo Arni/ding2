@@ -19,14 +19,7 @@ function ting_smart_search_menu() {
     'access arguments' => array('configure smart search'),
     'file' => 'includes/ting_smart_search.admin.inc',
   );
-  
-    $items['smart'] = array(
-    'title' => 'Ting smart search',
-    'description' => 'Manage smart search module',
-    'page callback' => 'ting_smart_search_get_autodata_from_webtrekk',
-    'page arguments' => array(),
-    'access arguments' => array('configure smart search'),
-  );
+
   return $items;
 }
 
@@ -203,7 +196,6 @@ function ting_smart_search_opensearch_pre_execute($request) {
           }
         }
       }
-file_put_contents("/var/www/drupal7vm/drupal/debug/smart1.txt", print_r($request->getQuery() . "\n", TRUE), FILE_APPEND);
       if ($smart_search_use_auto && variable_get('ting_smart_search_automatic_active', true)) {
         if (!(isset($smart_search_userdefined_boosts) && is_array($smart_search_userdefined_boosts))) {
           $smart_search_userdefined_boosts = array();
@@ -232,9 +224,7 @@ function ting_smart_search_auto(array $smart_search_userdefined_boosts, $query) 
   $string = trim($query, '()');
   $keys = str_replace(' and ', ' ', $string);
   $data = ting_smart_search_autodata_cache();
-file_put_contents("/var/www/drupal7vm/drupal/debug/smart2.txt", print_r($keys, TRUE), FILE_APPEND);
   if (isset($data) && array_key_exists(trim($keys), $data)) {
-    file_put_contents("/var/www/drupal7vm/drupal/debug/smart4.txt", print_r("Ramt", TRUE), FILE_APPEND);
     $i = 0;
     $weight = 10000;
     foreach ($data[$keys] as $faust => $objects) {
@@ -250,7 +240,6 @@ file_put_contents("/var/www/drupal7vm/drupal/debug/smart2.txt", print_r($keys, T
       }
     }
   }
-  file_put_contents("/var/www/drupal7vm/drupal/debug/smart3.txt", print_r($smart_search_userdefined_boosts, TRUE), FILE_APPEND);
   return $smart_search_userdefined_boosts;
 }
 
@@ -263,7 +252,6 @@ file_put_contents("/var/www/drupal7vm/drupal/debug/smart2.txt", print_r($keys, T
  */
 function ting_smart_search_autodata_cache() {
   if (file_exists(ting_smart_search_get_autodata_path())) {
-    file_put_contents("/var/www/drupal7vm/drupal/debug/smart5.txt", print_r("Ramt", TRUE), FILE_APPEND);
     @include ting_smart_search_get_autodata_path();
     return isset($ting_smart_search_autodata ) ? $ting_smart_search_autodata : NULL;
   }
@@ -534,8 +522,7 @@ function ting_smart_search_get_autodata_path() {
  */
 function ting_smart_search_get_autodata_from_webtrekk() {
   ini_set('memory_limit','1G');
-  file_put_contents("/var/www/drupal7vm/drupal/debug/smart10.txt", print_r("Ramt", TRUE), FILE_APPEND);
-  $url = variable_get('ting_smart_search_master_server_test', 'http://127.0.0.1/data/autodata.txt');//'https://staging.randersbib.dk/data/autodata.txt');
+  $url = variable_get('ting_smart_search_master_server_test', 'https://staging.randersbib.dk/data/autodata.txt');
   $path = ting_smart_search_get_autodata_path();
   try {
     $ch = curl_init($url);
